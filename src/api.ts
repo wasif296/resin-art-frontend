@@ -15,8 +15,6 @@ export interface RecordData {
   profit?: number;
 }
 
-// 1. URL ko sahi kiya (resin-art-backend)
-// 2. Aakhir mein slash (/) nahi lagaya taake routes sahi bante rahein
 const API_URL = "https://resin-art-backend.vercel.app/api/records";
 
 const api = axios.create({ 
@@ -26,13 +24,11 @@ const api = axios.create({
   }
 });
 
-// API Functions
 export const getRecords = () => api.get<RecordData[]>("/");
 export const addRecord = (data: RecordData) => api.post("/", data);
 export const updateRecord = (id: string, data: RecordData) => api.put(`/${id}`, data);
 export const deleteRecord = (id: string) => api.delete(`/${id}`);
 
-// Login Credentials typing
 export const loginUser = (credentials: { email: string; password?: string }) => 
   api.post("/login", credentials);
 
