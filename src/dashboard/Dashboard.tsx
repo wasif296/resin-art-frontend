@@ -256,7 +256,7 @@ const Dashboard = () => {
                         <>
                           <td className="px-4 py-3.5 uppercase text-[10px] tracking-tighter text-slate-500">{r.customerName}</td>
                           <td className="px-4 py-3.5 font-mono text-[10px]">{r.customerPhone}</td>
-                          <td className="px-4 py-3.5 italic text-slate-300 text-[10px] truncate max-w-[150px]">{r.deliveryAddress}</td>
+                          <td className="px-4 py-3.5 italic text-slate-400 text-[10px] truncate max-w-[150px]">{r.deliveryAddress}</td>
                         </>
                       )}
                       <td className="px-4 py-3.5 text-center font-black text-pink-500">x{r.quantity}</td>
@@ -374,66 +374,96 @@ const Dashboard = () => {
         </div>
       </main>
 
-      {/* --- RECEIPT MODAL (NaN Fixed & Labels Restored) --- */}
+      {/* --- RECEIPT MODAL --- */}
       {showReceipt && (
         <div className="fixed inset-0 bg-slate-900/95 backdrop-blur-xl z-[100] flex items-center justify-center p-4 overflow-y-auto font-sans">
-           <div className="bg-white rounded-3xl w-full max-w-sm shadow-2xl p-8 relative border-[10px] border-white/5 my-10 animate-in zoom-in-95">
-             <button onClick={() => setShowReceipt(null)} className="absolute top-4 right-4 p-1 hover:bg-slate-50 rounded-full text-slate-300 transition-all"> </button>
+           {/* Main White Card Box */}
+           <div className="bg-white rounded-[2.5rem] w-full max-w-sm shadow-2xl p-8 relative border-[10px] border-white/5 my-10 animate-in zoom-in-95 flex flex-col">
+             
+             {/* Receipt Content Area */}
              <div className="text-center">
-                <img src={logo} alt="Receipt Logo" className="w-16 h-16 mx-auto mb-4 object-contain" />
+                <img src={logo} alt="Receipt Logo" className="w-16 h-16 mx-auto mb-4 object-contain shadow-sm rounded-full bg-white p-0.5" />
                 <h4 className="text-2xl font-black text-slate-800 tracking-tighter mb-0 italic uppercase">Resin Art by Ayesha</h4>
                 <p className="text-[9px] text-slate-400 uppercase font-black tracking-widest mt-1 italic tracking-tighter">Handcrafted Resin Creations</p>
                 
-                <div className="flex justify-between items-center border-y border-slate-100 py-4 my-6 text-[9px] font-black text-slate-400 uppercase tracking-widest italic">
-                  {/* <span>#INV-${showReceipt.invoiceNo || '0001'}</span> */}
+                <div className="flex justify-between items-center border-y border-slate-100 py-4 my-6 text-[9px] font-bold text-slate-400 uppercase tracking-widest">
+                  {/* <span>#INV-${records.filter(x=>x.type==='Sale').length.toString().padStart(4,'0')}</span> */}
                   <span>{new Date(showReceipt.date).toLocaleDateString('en-GB', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
                 </div>
 
-                <div className="text-left space-y-4 mb-8 text-[11px] font-bold">
-                  <div className="flex flex-col"><span className="text-[8px] font-black text-slate-200 uppercase tracking-widest mb-1">Customer Billed To</span><span className="font-black text-slate-800 uppercase text-lg border-b-2 border-pink-100 w-fit pb-1 leading-none">{showReceipt.customerName}</span></div>
-                  <div className="space-y-1"><p className="text-slate-400">{showReceipt.customerPhone}</p><p className="text-slate-400 italic font-medium leading-relaxed">{showReceipt.deliveryAddress}</p></div>
+                <div className="text-left space-y-4 mb-10 text-[11px] font-bold   ">
+                  <div className="flex flex-col">
+                    <span className="text-[8px] font-bold text-slate-400 uppercase tracking-widest mb-1">Customer Details</span>
+                    <span className="font-bold text-slate-800 uppercase text-lg leading-none">{showReceipt.customerName}</span>
+                  </div>
+                  <div className="space-y-1">
+                    <p className="text-slate-400">{showReceipt.customerPhone}</p>
+                    <p className="text-slate-400 italic font-medium leading-relaxed">{showReceipt.deliveryAddress}</p>
+                  </div>
                 </div>
 
-                <div className="border-t border-slate-100 pt-6 space-y-4">
-                   <div className="flex justify-between items-center text-[9px] font-black text-slate-200 uppercase tracking-[0.2em]"><span> Item</span><span>Total Price</span></div>
+                <div className="border-t border-slate-100 pt-6 space-y-4 font-sans">
+                   <div className="flex justify-between items-center text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em]">
+                     <span>Item</span>
+                     <span>Amount</span>
+                   </div>
                    <div className="flex justify-between items-start text-left">
                       <div className="flex flex-col">
-                        <span className="font-black text-slate-700 text-sm tracking-tight uppercase italic">{showReceipt.itemName}</span>
-                        <span className="text-[10px] font-bold text-slate-300 mt-1 italic font-mono">Qty: {showReceipt.quantity} × Rs {showReceipt.unitPrice?.toLocaleString()}</span>
+                        <span className="font-bold text-slate-700 text-sm tracking-tight uppercase italic">{showReceipt.itemName}</span>
+                        <span className="text-[10px] font-bold text-slate-400 mt-1 italic font-mono">
+                          {/* Unit Price Calculation Fix with Math.round to avoid decimals like .6 */}
+                          Qty: {showReceipt.quantity} × Rs { Math.round(showReceipt.unitPrice || (Number(showReceipt.totalPrice) / Number(showReceipt.quantity || 1))).toLocaleString() }
+                        </span>
                       </div>
-                      {/* Price Fix for NaN: Using showReceipt.totalPrice directly */}
-                      <span className="font-black text-slate-900 text-sm tabular-nums">Rs {(Number(showReceipt.unitPrice) * Number(showReceipt.quantity)).toLocaleString()}</span>
+                      <span className="font-bold text-slate-900 text-sm tabular-nums tracking-tighter">
+                        Rs { Math.round(Number(showReceipt.totalPrice || 0)).toLocaleString() }
+                      </span>
                    </div>
                 </div>
 
                 <div className="mt-8 border-t-2 border-dashed border-slate-100 pt-8 space-y-3">
                    {Number(showReceipt.discount) > 0 && (
                       <div className="flex justify-between items-center text-pink-400 font-bold italic text-sm">
-                        <span className="text-[10px] uppercase tracking-widest"> Discount</span>
-                        <span className="tabular-nums">-Rs {showReceipt.discount?.toLocaleString()}</span>
+                        <span className="text-[10px] uppercase tracking-widest tracking-tighter"> Discount</span>
+                        <span className="tabular-nums">-Rs {Number(showReceipt.discount).toLocaleString()}</span>
                       </div>
                    )}
-                   <div className="flex justify-between items-center font-black border-t-2 border-slate-100 pt-6">
-                      <span className="text-slate-400 uppercase text-xs tracking-[0.2em]">Total Amount</span>
-                      <span className="text-3xl text-slate-900 tracking-tighter tabular-nums italic underline decoration-[#d4af37] decoration-4 underline-offset-4 leading-none">Rs {showReceipt.totalPrice.toLocaleString()}</span>
+                   <div className="flex justify-between items-center font-bold border-t-2 border-slate-50 pt-4">
+                      <span className="text-slate-400 uppercase text-xs tracking-widest">Grand Total</span>
+                      <span className="text-3xl text-slate-900 tracking-tighter tabular-nums italic underline decoration-[#d4af37] decoration-4 underline-offset-4 leading-none">
+                        Rs { Math.round(Number(showReceipt.totalPrice)).toLocaleString() }
+                      </span>
                    </div>
                 </div>
 
                 <div className="mt-12 text-center text-slate-300">
-                   <div className="flex items-center justify-center gap-2 text-pink-500 font-bold text-[10px] mb-4 uppercase tracking-[0.1em] border p-2 rounded-xl w-fit mx-auto shadow-sm">
-                      <Instagram size={14}/> @resin.art_by_ayesha
+                   <div className="flex items-center justify-center gap-2 text-pink-500 font-bold text-[10px] mb-4 uppercase p-2 border rounded-xl w-fit mx-auto shadow-sm tracking-widest italic">
+                     <Instagram size={14}/> @resin.art_by_ayesha
                    </div>
-                   <p className="text-[9px] font-black uppercase tracking-[0.5em] italic">Handcrafted with love</p>
+                   <p className="text-[9px] font-black uppercase tracking-[0.5em] italic font-sans">Made with Love & Resin ✨</p>
                 </div>
              </div>
-             <div className="flex gap-4 mt-10">
-                <button onClick={() => window.print()} className="flex-[2] py-4 bg-[#d4af37] text-white rounded-3xl font-black text-[10px] uppercase tracking-widest shadow-xl active:scale-95 transition-all">Print Official Receipt</button>
-                <button onClick={() => setShowReceipt(null)} className="flex-1 py-4 bg-slate-50 text-slate-400 rounded-3xl font-black text-[10px] uppercase border">Close</button>
+
+             {/* Buttons INSIDE the white card now */}
+             <div className="flex gap-4 mt-8">
+                <button 
+                  onClick={() => window.print()} 
+                  className="flex-[2] py-2 bg-[#d4af37] text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl active:scale-95 transition-all hover:bg-black"
+                >
+                  Print Bill
+                </button>
+                <button 
+                  onClick={() => setShowReceipt(null)} 
+                  className="flex-1 py-2 bg-slate-50 text-slate-400 rounded-2xl font-bold text-xs uppercase tracking-widest border border-slate-100 transition-all hover:bg-slate-100"
+                >
+                  Close
+                </button>
              </div>
            </div>
         </div>
       )}
     </div>
+    
   );
 };
 
